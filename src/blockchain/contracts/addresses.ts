@@ -1,0 +1,1 @@
+export const voteAddress = "0x2041AD809C1C1B67Ae9b770d6F84Cea5594E5A3C";

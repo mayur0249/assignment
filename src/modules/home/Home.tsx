@@ -36,6 +36,9 @@ import { imageUrl } from "../../shared/utility";
 import { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { useVote } from "../../shared/hooks/useVote";
+import { voteAbi } from "../../blockchain/contracts/abi";
+import { voteAddress } from "../../blockchain/contracts/addresses";
+import Web3 from "web3";
 
 export const Home: React.FC = withTheme((props: ThemeProps<any>) => {
   const { theme } = props;
@@ -66,9 +69,32 @@ export const Home: React.FC = withTheme((props: ThemeProps<any>) => {
     }
   };
 
+  const event = async () => {
+    const web3 = new Web3(
+      Web3.givenProvider || "https://ropsten.infura.io/v3/"
+    );
+
+    const contractInstance = new web3.eth.Contract(voteAbi, voteAddress);
+
+    let options = {
+      filter: { _candidateId: "1" },
+      fromBlock: 0,
+      toBlock: "latest",
+    };
+
+    const pastEvent = await contractInstance.getPastEvents(
+      "votedEvent",
+      options,
+      (err, events) => {
+        console.log("events", events);
+      }
+    );
+  };
+
   useEffect(() => {
     getCandidateDetails();
     isVoters();
+    event();
   }, [account]);
 
   return (
